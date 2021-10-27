@@ -7,7 +7,7 @@
 # ==========================================================================
 
 if(!require(pacman)) install.packages("pacman")
-pacman::p_load(colorout, googledrive, bit64, fs, data.table, tigris, tidycensus, tidyverse, spdep)
+pacman::p_load( googledrive, bit64, fs, data.table, tigris, tidycensus, tidyverse, spdep)
 # options(width = Sys.getenv('COLUMNS'))
 
 ### Set API key
@@ -21,7 +21,7 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key h
 # you will need to update the 'data_dir' variable to the directory
 # you're using
 
-data_dir <- "~/git/displacement-typologies/data/outputs/databases/"
+data_dir <- "~/Documents/git/displacement-typologies/data/outputs/databases/"
 csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
 
 df <- 
@@ -53,6 +53,10 @@ df <-
             read_csv("~/git/displacement-typologies/data/outputs/databases/Cleveland_database_2018.csv") %>% 
             select(!X1) %>% 
             mutate(city = "Cleveland") %>% 
+            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
+            read_csv("~/git/displacement-typologies/data/outputs/databases/SaltLakeCity_database_2018.csv") %>% 
+            select(!X1) %>% 
+            mutate(city = "Salt Lake City") %>% 
             mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric))#,
             # read_csv("~/git/displacement-typologies/data/outputs/databases/Memphis_database_2018.csv") %>% 
             # select(!X1) %>% 
@@ -74,7 +78,7 @@ df <-
 # Memphis and IN is within close proximity of Chicago. 
 
 ### Tract data extraction function: add your state here
-st <- c("IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH")
+st <- c("IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH", "UT")
 
 tr_rent <- function(year, state){
     get_acs(
@@ -162,7 +166,9 @@ states <-
     raster::union(tracts("WA", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("OH", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("MA", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("NH", cb = TRUE, class = 'sp'))
+    raster::union(tracts("NH", cb = TRUE, class = 'sp')) %>%
+    raster::union(tracts("", cb = TRUE, class = 'sp'))
+    
 
 stsp <- states
 
