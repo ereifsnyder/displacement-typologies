@@ -21,50 +21,24 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key h
 # you will need to update the 'data_dir' variable to the directory
 # you're using
 
-data_dir <- "~/Documents/git/displacement-typologies/data/outputs/databases/"
+# edit path to your repo
+path <- "~/git/displacement-typologies_er"
+data_dir <- paste0(path, "/data/outputs/databases/")
+csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
 csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
 
+### Dev file extraction
 df <- 
-    bind_rows(
-            read_csv("~/git/displacement-typologies/data/outputs/databases/Atlanta_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Atlanta") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/Denver_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Denver") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/Chicago_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Chicago") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/LosAngeles_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Los Angeles") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)), # temp fix
-            read_csv("~/git/displacement-typologies/data/outputs/databases/SanFrancisco_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "San Francisco") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/Seattle_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Seattle") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/Cleveland_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Cleveland") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("~/git/displacement-typologies/data/outputs/databases/SaltLakeCity_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Salt Lake City") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric))#,
-            # read_csv("~/git/displacement-typologies/data/outputs/databases/Memphis_database_2018.csv") %>% 
-            # select(!X1) %>% 
-            # mutate(city = "Memphis"),
-            # read_csv("~/git/displacement-typologies/data/outputs/databases/Boston_database.csv") %>%
-            # select(!X1) %>%
-            # mutate(city = "Boston")
-    )
+    map_dfr(csv_files, function(file){
+        read_csv(file, show_col_types = FALSE) %>% 
+        # select(-...1) %>% 
+        mutate(
+            city = gsub('.*/databases/\\s{0,1}(.*)\\_database_.*', '\\1', file)) %>% 
+        mutate_at(vars(state_y:tract_y, state:tract, pctch_real_mhval_00_18), list(as.numeric))
+    }) %>% 
+    select(-1)
+
+### End dev
 
 # ==========================================================================
 # Create rent gap and extra local change in rent
@@ -167,8 +141,7 @@ states <-
     raster::union(tracts("OH", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("MA", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("NH", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("UT", cb = TRUE, class = 'sp'))
-    
+    raster::union(tracts("UT", cb = TRUE, class = 'sp'))    
 
 stsp <- states
 
@@ -183,7 +156,7 @@ stsp@data <-
             !is.na(GEOID.1.2) ~ GEOID.1.2, 
             !is.na(GEOID.1.3) ~ GEOID.1.3, 
             !is.na(GEOID.1.4) ~ GEOID.1.4, 
-            !is.na(GEOID.1.5) ~ GEOID.1.5), 
+            !is.na(GEOID.1.5) ~ GEOID.1.5)
     ), 
         tr_rents, 
         by = "GEOID") %>% 
@@ -202,7 +175,7 @@ stsp@data <-
     max_1nn <- max(dist)
     dist_nb <- dnearneigh(coords, d1=0, d2 = .1*max_1nn, row.names = IDs)
     spdep::set.ZeroPolicyOption(TRUE)
-    spdep::set.ZeroPolicyOption(TRUE)
+    spdep::set.ZeroPolicyOption(TRUE) # code is twice because we need a TRUE response
     dists <- nbdists(dist_nb, coordinates(stsp))
     idw <- lapply(dists, function(x) 1/(x^2))
     lw_dist_idwW <- nb2listw(dist_nb, glist = idw, style = "W")
