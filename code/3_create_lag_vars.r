@@ -167,7 +167,7 @@ states <-
     raster::union(tracts("OH", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("MA", cb = TRUE, class = 'sp')) %>%
     raster::union(tracts("NH", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("", cb = TRUE, class = 'sp'))
+    raster::union(tracts("UT", cb = TRUE, class = 'sp'))
     
 
 stsp <- states
