@@ -1269,8 +1269,9 @@ htmlwidgets::saveWidget(SCAG, file=paste0(path, "/displacement-typologies/maps/S
 #
 # Create file exports
 # --------------------------------------------------------------------------
-scag_sf <- df_sf_urban %>% filter(city == "SCAG") 
+scag_sf <- df_sf_urban %>% filter(city == "SCAG") %>% select(GEOID, Typology)
 st_write(obj = scag_sf, dsn = paste0(path, "/displacement-typologies/data/downloads_for_public/scag.gpkg"))
+st_write(obj = scag_sf, dsn = paste0(path, "/displacement-typologies/data/downloads_for_public/scag.shp"))
 write_csv(scag_sf %>% st_set_geometry(NULL), paste0(path, "/displacement-typologies/data/downloads_for_public/scag.csv"))
 ### left off: above not working ###
 atl_sf <- df_sf_urban %>% filter(city == "Atlanta") %>% select(GEOID, Typology)
