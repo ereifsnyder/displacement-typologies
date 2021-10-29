@@ -24,8 +24,12 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key h
 # edit path to your repo
 path <- "~/git/displacement-typologies_er"
 data_dir <- paste0(path, "/data/outputs/databases/")
-csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
-csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
+
+## For all files
+# csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
+
+## For select files
+# csv_files <- fs::dir_ls(data_dir, regexp = "SaltLakeCity_database_2018.csv$")
 
 ### Dev file extraction
 df <- 
@@ -33,7 +37,7 @@ df <-
         read_csv(file, show_col_types = FALSE) %>% 
         # select(-...1) %>% 
         mutate(
-            city = gsub('.*/databases/\\s{0,1}(.*)\\_database_.*', '\\1', file)) %>% 
+            city = as.character(gsub('.*/databases/\\s{0,1}(.*)\\_database_.*', '\\1', file))) %>% 
         mutate_at(vars(state_y:tract_y, state:tract, pctch_real_mhval_00_18), list(as.numeric))
     }) %>% 
     select(-1)
@@ -52,7 +56,8 @@ df <-
 # Memphis and IN is within close proximity of Chicago. 
 
 ### Tract data extraction function: add your state here
-st <- c("IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH", "UT")
+st <- c(#"IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH", 
+    "UT")
 
 tr_rent <- function(year, state){
     get_acs(
@@ -124,43 +129,48 @@ tr_rents <-
 
 gc()
 
-states <- 
-    raster::union(
-        tracts("IL", cb = TRUE, class = 'sp'), 
-        tracts("GA", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("AR", cb = TRUE, class = 'sp')) %>%  
-    raster::union(tracts("TN", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("CO", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("MS", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("AL", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("KY", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("MO", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("IN", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("CA", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("WA", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("OH", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("MA", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("NH", cb = TRUE, class = 'sp')) %>%
-    raster::union(tracts("UT", cb = TRUE, class = 'sp'))    
+# states <- 
+    # raster::union(
+    #     tracts("IL", cb = TRUE, class = 'sp'), 
+    #     tracts("GA", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("AR", cb = TRUE, class = 'sp')) %>%  
+    # raster::union(tracts("TN", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("CO", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("MS", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("AL", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("KY", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("MO", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("IN", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("CA", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("WA", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("OH", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("MA", cb = TRUE, class = 'sp')) %>%
+    # raster::union(tracts("NH", cb = TRUE, class = 'sp')) %>%
+    # raster::union(
+    #     tracts("UT", cb = TRUE, class = 'sp')
+    # )    
 
-stsp <- states
+stsp <- tracts("UT", cb = TRUE, class = 'sp')
 
 # join data to these tracts
-stsp@data <-
-    left_join(
-        stsp@data %>% 
-        mutate(GEOID = case_when(
-            !is.na(GEOID.1) ~ GEOID.1, 
-            !is.na(GEOID.2) ~ GEOID.2, 
-            !is.na(GEOID.1.1) ~ GEOID.1.1, 
-            !is.na(GEOID.1.2) ~ GEOID.1.2, 
-            !is.na(GEOID.1.3) ~ GEOID.1.3, 
-            !is.na(GEOID.1.4) ~ GEOID.1.4, 
-            !is.na(GEOID.1.5) ~ GEOID.1.5)
-    ), 
-        tr_rents, 
-        by = "GEOID") %>% 
-    select(GEOID:rm_medrent12)
+# stsp@data <-
+#     left_join(
+#         stsp@data %>% 
+#         mutate(GEOID = case_when(
+#             !is.na(GEOID.1) ~ GEOID.1, 
+#             !is.na(GEOID.2) ~ GEOID.2, 
+#             !is.na(GEOID.1.1) ~ GEOID.1.1, 
+#             !is.na(GEOID.1.2) ~ GEOID.1.2, 
+#             !is.na(GEOID.1.3) ~ GEOID.1.3, 
+#             !is.na(GEOID.1.4) ~ GEOID.1.4, 
+#             !is.na(GEOID.1.5) ~ GEOID.1.5)
+#     ), 
+#         tr_rents, 
+#         by = "GEOID") %>% 
+#     select(GEOID:rm_medrent12)
+
+stsp@data <- 
+    left_join(stsp@data, tr_rents, by = "GEOID") %>% select(GEOID:rm_medrent12)
 
 #
 # Create neighbor matrix
@@ -253,4 +263,4 @@ lag <- left_join(lag, stsf)
 # ==========================================================================
 
 # saveRDS(df2, "~/git/displacement-typologies/data/rentgap.rds")
-fwrite(lag, "~/git/displacement-typologies/data/outputs/lags/lag.csv")
+fwrite(lag, "~/git/displacement-typologies/data/outputs/lags/lag_ut.csv")
