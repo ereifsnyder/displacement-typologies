@@ -26,7 +26,7 @@ options(scipen = 10) # avoid scientific notation
 if (!require("pacman")) install.packages("pacman")
 if (!require("tidyverse")) install.packages("tidyverse")
 pacman::p_install_gh("timathomas/neighborhood", "jalvesaq/colorout")
-pacman::p_load(colorout, readxl, R.utils, bit64, neighborhood, rmapshaper, sf, geojsonsf, scales, data.table, tigris, tidycensus, leaflet, tidyverse)
+pacman::p_load( readxl, R.utils, bit64, neighborhood, rmapshaper, sf, geojsonsf, scales, data.table, tigris, tidycensus, leaflet, tidyverse)
 
 update.packages(ask = FALSE)
 # Cache downloaded tiger files
@@ -56,7 +56,9 @@ data <-
         read_csv('~/git/displacement-typologies/data/outputs/typologies/SanFrancisco_typology_output.csv') %>% 
             mutate(city = 'SanFrancisco'),
         read_csv('~/git/displacement-typologies/data/outputs/typologies/Seattle_typology_output.csv') %>% 
-            mutate(city = 'Seattle')
+            mutate(city = 'Seattle'),
+        read_csv('~/git/displacement-typologies/data/outputs/typologies/SaltLakeCity_typology_output.csv') %>% 
+          mutate(city = 'SaltLakeCity')
     ) %>% 
     left_join(., 
         read_csv('~/git/displacement-typologies/data/overlays/oppzones.csv') %>% 
@@ -82,16 +84,17 @@ states <- c(
         '33', # New Hampshire
         '39', # Ohio
         '47', # Tennessee
+        '49', # Utah
         '53') # Washington
 
 ###
 # Begin Neighborhood Typology creation
 ###
-# df_nt <- ntdf(state = states) %>% mutate(GEOID = as.numeric(GEOID))
-# ntcheck(df_nt)
-# glimpse(df_nt)
-# df_nt %>% group_by(nt_conc) %>% count() %>% arrange(desc(n))
-# fwrite(df_nt, '~/git/displacement-typologies/data/outputs/downloads/df_nt.csv.gz')
+ # df_nt <- ntdf(state = states) %>% mutate(GEOID = as.numeric(GEOID))
+ # ntcheck(df_nt)
+ # glimpse(df_nt)
+ # df_nt %>% group_by(nt_conc) %>% count() %>% arrange(desc(n))
+ # fwrite(df_nt, '~/git/displacement-typologies/data/outputs/downloads/df_nt.csv.gz')
 ###
 # End
 ###
@@ -131,26 +134,26 @@ df_nt <- read_csv('~/git/displacement-typologies/data/outputs/downloads/dt_nt.cs
 ###
 # Begin demographic download
 ###
-# dem_vars <- 
-#   c('st_units' = 'B25001_001',
-#     'st_vacant' = 'B25002_003', 
-#     'st_ownocc' = 'B25003_002', 
-#     'st_rentocc' = 'B25003_003',
-#     'st_totenroll' = 'B14007_001',
-#     'st_colenroll' = 'B14007_017',
-#     'st_proenroll' = 'B14007_018',
-#     'st_pov_under' = 'B14006_009', 
-#     'st_pov_grad' = 'B14006_010')
-# tr_dem_acs <-
-#   get_acs(
-#     geography = "tract",
-#     state = states,
-#     output = 'wide',
-#     variables = dem_vars,
-#     cache_table = TRUE,
-#     year = 2018
-#   )
-# fwrite(tr_dem_acs, '~/git/displacement-typologies/data/outputs/downloads/tr_dem_acs.csv.gz')
+ # dem_vars <- 
+ #   c('st_units' = 'B25001_001',
+ #     'st_vacant' = 'B25002_003', 
+ #     'st_ownocc' = 'B25003_002', 
+ #     'st_rentocc' = 'B25003_003',
+ #     'st_totenroll' = 'B14007_001',
+ #     'st_colenroll' = 'B14007_017',
+ #     'st_proenroll' = 'B14007_018',
+ #     'st_pov_under' = 'B14006_009', 
+ #     'st_pov_grad' = 'B14006_010')
+ # tr_dem_acs <-
+ #   get_acs(
+ #     geography = "tract",
+ #     state = states,
+ #     output = 'wide',
+ #     variables = dem_vars,
+ #     cache_table = TRUE,
+ #     year = 2018
+ #   )
+ # fwrite(tr_dem_acs, '~/git/displacement-typologies/data/outputs/downloads/tr_dem_acs.csv.gz')
 ### 
 # End
 ###
@@ -379,23 +382,23 @@ df <-
 ###
 # Begin Download tracts in each of the shapes in sf (simple feature) class
 ###
-# tracts <- 
-#     reduce(
-#         map(states, function(x) # purr loop
-#             get_acs(
-#                 geography = "tract", 
-#                 variables = "B01003_001", 
-#                 state = x, 
-#                 geometry = TRUE, 
-#                 year = 2018)
-#         ), 
-#         rbind # bind each of the dataframes together
-#     ) %>% 
-#     select(GEOID) %>% 
-#     mutate(GEOID = as.numeric(GEOID)) %>% 
-#     st_transform(st_crs(4326)) 
-
-#     saveRDS(tracts, '~/git/displacement-typologies/data/outputs/downloads/state_tracts.RDS')
+ # tracts <- 
+ #     reduce(
+ #         map(states, function(x) # purr loop
+ #             get_acs(
+ #                 geography = "tract", 
+ #                 variables = "B01003_001", 
+ #                 state = x, 
+ #                 geometry = TRUE, 
+ #               year = 2018)
+ #         ), 
+ #         rbind # bind each of the dataframes together
+ #     ) %>% 
+ #     select(GEOID) %>% 
+ #     mutate(GEOID = as.numeric(GEOID)) %>% 
+ #     st_transform(st_crs(4326)) 
+ # 
+ #     saveRDS(tracts, '~/git/displacement-typologies/data/outputs/downloads/state_tracts.RDS')
 ###
 # End
 ###
@@ -416,10 +419,10 @@ df_sf <-
 ###
 # Begin Download
 ###
-# urban_areas <- 
-#   urban_areas() %>% 
-#   st_transform(st_crs(df_sf))
-# saveRDS(urban_areas, "~/git/displacement-typologies/data/outputs/downloads/urban_areas.rds")
+ # urban_areas <- 
+ #   urban_areas() %>% 
+ #   st_transform(st_crs(df_sf))
+ # saveRDS(urban_areas, "~/git/displacement-typologies/data/outputs/downloads/urban_areas.rds")
 ### 
 # End Download
 ###
@@ -434,29 +437,29 @@ urban_areas <-
 ###
 # Begin Download Counties
 ###
-# counties <- 
-#   counties(states) %>% 
-#   st_transform(st_crs(df_sf)) %>% 
-#   .[df_sf, ]  %>% 
-#   arrange(STATEFP, COUNTYFP) 
-#
-# st_geometry(counties) <- NULL
-#
-# state_water <- counties %>% pull(STATEFP)
-# county_water <- counties %>% pull(COUNTYFP)
-#
-# water <- 
-# map2_dfr(state_water, county_water, 
-#   function(states = state_water, counties = county_water){
-#     area_water(
-#       state = states,
-#       county = counties, 
-#       class = 'sf') %>% 
-#     filter(AWATER > 500000)
-#     }) %>% 
-# st_transform(st_crs(df_sf))
-#
-# saveRDS(water, "~/git/displacement-typologies/data/outputs/downloads/water.rds")
+ # counties <- 
+ #   counties(states) %>% 
+ #   st_transform(st_crs(df_sf)) %>% 
+ #   .[df_sf, ]  %>% 
+ #   arrange(STATEFP, COUNTYFP) 
+ # 
+ # st_geometry(counties) <- NULL
+ # 
+ # state_water <- counties %>% pull(STATEFP)
+ # county_water <- counties %>% pull(COUNTYFP)
+ # 
+ # water <- 
+ # map2_dfr(state_water, county_water, 
+ #   function(states = state_water, counties = county_water){
+ #     area_water(
+ #       state = states,
+ #       county = counties, 
+ #       class = 'sf') %>% 
+ #     filter(AWATER > 500000)
+ #     }) %>% 
+ # st_transform(st_crs(df_sf))
+ # 
+ # saveRDS(water, "~/git/displacement-typologies/data/outputs/downloads/water.rds")
 ###
 # End
 ###
@@ -508,7 +511,11 @@ red <-
         geojson_sf('~/git/displacement-typologies/data/overlays/CAOakland1937.geojson') %>% 
         mutate(city = 'SanFrancisco'),
         geojson_sf('~/git/displacement-typologies/data/overlays/CASanFrancisco1937.geojson') %>% 
-        mutate(city = 'SanFrancisco')) %>% 
+        mutate(city = 'SanFrancisco'),
+        geojson_sf('~/git/displacement-typologies/data/overlays/UTOgden19XX.geojson') %>% 
+        mutate(city = 'SaltLakeCity'),
+        geojson_sf('~/git/displacement-typologies/data/overlays/UTSaltLakeCity19XX.geojson') %>% 
+        mutate(city = 'SaltLakeCity')) %>% 
     mutate(
         Grade = 
             factor(
@@ -1215,6 +1222,15 @@ seattle <-
     setView(lng = -122.3, lat = 47.6, zoom = 9)
 # save map
 htmlwidgets::saveWidget(seattle, file="~/git/displacement-typologies/maps/seattle_udp.html")
+
+# Salt Lake CIty, UT
+slc <- 
+  map_it("SaltLakeCity", 'UT') %>% 
+  oz(city_name = "SaltLakeCity") %>% 
+  options(oz = "Opportunity Zones") %>% 
+  setView(lng = -111.89, lat = 40.76, zoom = 9)
+# save map
+htmlwidgets::saveWidget(slc, file="~/git/displacement-typologies/maps/SaltLakeCity_udp.html")
  
 #
 # Create file exports
