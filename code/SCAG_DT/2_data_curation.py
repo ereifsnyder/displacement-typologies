@@ -27,8 +27,8 @@ pd.set_option('display.max_rows', None)
 pd.options.display.float_format = '{:.2f}'.format # avoid scientific notation
 
 home = str(Path.home())
-input_path = home+'/Documents/GitHub/displacement-typologies/data/inputs/'
-output_path = home+'/Documents/GitHub/displacement-typologies/data/outputs/'
+input_path = home+'/git/displacement-typologies/data/inputs/'
+output_path = home+'/git/displacement-typologies/data/outputs/'
 
 # ==========================================================================
 # Set API Key + Select City to Run (inputs needed)
@@ -42,11 +42,11 @@ c = census.Census(key)
 # --------------------------------------------------------------------------
 # For command line operation (e.g. python3 2_data_curation.py Atlanta),
 # uncomment the following (default)
-#city_name = str(sys.argv[1])
+city_name = str(sys.argv[1])
 
 # For testing different cities while working within the code,
 # uncomment the following and rename city as needed
-city_name = "Ventura"
+# city_name = "Santa Barbara"
 
 # ==========================================================================
 # ==========================================================================
@@ -80,7 +80,7 @@ xwalk_00_10 = pd.read_csv(input_path+'crosswalk_2000_2010.csv')
 
 if city_name == 'Chicago':
     state = '17'
-    FIPS = ['031', '043', '089', '093', '097', '111', '197'] # county fips
+    FIPS = ['031', '043', '089', '093', '097', '111', '197']
 elif city_name == 'Atlanta':
     state = '13'
     FIPS = ['057', '063', '067', '089', '097', '113', '121', '135', '151', '247']
@@ -117,6 +117,18 @@ elif city_name == 'Imperial':
 elif city_name == 'Ventura':
     state = '06'
     FIPS = '111'
+elif city_name == 'Santa Barbara':
+    state = '06'
+    FIPS = '083'
+elif city_name == 'San Luis Obispo':
+    state = '06'
+    FIPS = '079'
+elif city_name == 'Monterey':
+    state = '06'
+    FIPS = '053'
+elif city_name == 'Santa Cruz':
+    state = '06'
+    FIPS = '087'
 else:
     print ('There is not information for the selected city')
 
@@ -256,7 +268,7 @@ pub_hous = pd.read_csv(input_path+'Public_Housing_Buildings.csv.gz')
 # ==========================================================================
 # Read Shapefile Data (inputs needed)
 # ==========================================================================
-# Note: Similar to above, add a 'elif' for you city here
+# Note: Similar to above, add a 'elif' for your city here
 # Pull cartographic boundary files from here:
 # https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.2017.html
 
@@ -285,6 +297,14 @@ elif city_name == 'Riverside':
 elif city_name == 'Imperial':
     shp_name = 'cb_2018_06_tract_500k.shp'
 elif city_name == 'Ventura':
+    shp_name = 'cb_2018_06_tract_500k.shp'
+elif city_name == 'Santa Barbara':
+    shp_name = 'cb_2018_06_tract_500k.shp'
+elif city_name == 'San Luis Obispo':
+    shp_name = 'cb_2018_06_tract_500k.shp'
+elif city_name == 'Monterey':
+    shp_name = 'cb_2018_06_tract_500k.shp'
+elif city_name == 'Santa Cruz':
     shp_name = 'cb_2018_06_tract_500k.shp'
 city_shp = gpd.read_file(shp_folder+shp_name)
 
@@ -369,6 +389,30 @@ elif city_name == 'Ventura':
     state = '06'
     state_init = ['CA']
     FIPS = '111'
+    rail_agency = [ 'Metrolink', 'Amtrak']
+    zone = '11S'
+elif city_name == 'Santa Barbara':
+    state = '06'
+    state_init = ['CA']
+    FIPS = '083'
+    rail_agency = [ 'Metrolink', 'Amtrak']
+    zone = '11S'
+elif city_name == 'San Luis Obispo':
+    state = '06'
+    state_init = ['CA']
+    FIPS = '079'
+    rail_agency = [ 'Metrolink', 'Amtrak']
+    zone = '11S'
+elif city_name == 'Monterey':
+    state = '06'
+    state_init = ['CA']
+    FIPS = '053'
+    rail_agency = [ 'Metrolink', 'Amtrak']
+    zone = '11S'
+elif city_name == 'Santa Cruz':
+    state = '06'
+    state_init = ['CA']
+    FIPS = '087'
     rail_agency = [ 'Metrolink', 'Amtrak']
     zone = '11S'
 else:
@@ -1077,30 +1121,30 @@ census_zillow_tract_list.describe()
 # --------------------------------------------------------------------------
 
 ## Filter only existing rail
-rail = rail[rail['Year Opened']=='Pre-2000'].reset_index(drop = True)
+# rail = rail[rail['Year Opened']=='Pre-2000'].reset_index(drop = True)
 
-## Filter by city
-rail = rail[rail['Agency'].isin(rail_agency)].reset_index(drop = True)
-rail = gpd.GeoDataFrame(rail, geometry=[Point(xy) for xy in zip (rail['Longitude'], rail['Latitude'])])
+# ## Filter by city
+# rail = rail[rail['Agency'].isin(rail_agency)].reset_index(drop = True)
+# rail = gpd.GeoDataFrame(rail, geometry=[Point(xy) for xy in zip (rail['Longitude'], rail['Latitude'])])
 
-## sets coordinate system to WGS84
-rail.crs = {'init' :'epsg:4269'}
+# ## sets coordinate system to WGS84
+# rail.crs = {'init' :'epsg:4269'}
 
-## creates UTM projection
-## zone is defined under define city specific variables
-projection = '+proj=utm +zone='+zone+', +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+# ## creates UTM projection
+# ## zone is defined under define city specific variables
+# projection = '+proj=utm +zone='+zone+', +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
 
-## project to UTM coordinate system
-rail_proj = rail.to_crs(projection)
+# ## project to UTM coordinate system
+# rail_proj = rail.to_crs(projection)
 
-## create buffer around anchor institution in meters
-rail_buffer = rail_proj.buffer(804.672)
+# ## create buffer around anchor institution in meters
+# rail_buffer = rail_proj.buffer(804.672)
 
-## convert buffer back to WGS84
-rail_buffer_wgs = rail_buffer.to_crs(epsg=4326)
+# ## convert buffer back to WGS84
+# rail_buffer_wgs = rail_buffer.to_crs(epsg=4326)
 
-## crate flag
-city_shp['rail'] = np.where(city_shp.intersects(rail_buffer_wgs.unary_union) == True, 1, 0)
+# ## crate flag
+# city_shp['rail'] = np.where(city_shp.intersects(rail_buffer_wgs.unary_union) == True, 1, 0)
 
 # Subsidized Housing
 # --------------------------------------------------------------------------
@@ -1145,7 +1189,8 @@ city_shp['presence_ph_LIHTC'] = city_shp.intersects(presence_ph_LIHTC.unary_unio
 
 city_shp['GEOID'] = city_shp['GEOID'].astype('int64')
 
-census_zillow = census_zillow.merge(city_shp[['GEOID','geometry','rail',
+census_zillow = census_zillow.merge(city_shp[['GEOID','geometry',
+    # 'rail',
 	# 'anchor_institution',
 	'presence_ph_LIHTC']], right_on = 'GEOID', left_on = 'FIPS')
 census_zillow.query("FIPS == 13121011100")

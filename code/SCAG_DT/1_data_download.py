@@ -31,7 +31,7 @@ pd.options.display.float_format = '{:.2f}'.format # avoid scientific notation
 
 home = str(Path.home())
 input_path = home+'/git/displacement-typologies/data/inputs/'
-output_path = home+'/Documents/GitHub/displacement-typologies/data/outputs/'
+output_path = home+'/git/displacement-typologies/data/outputs/'
 
 # ==========================================================================
 # Set API Key
@@ -50,8 +50,8 @@ c = census.Census(key)
 # `python data.py <city name>`
 # Example: python data.py Atlanta
 
-#city_name = str(sys.argv[1])
-city_name = "Riverside"
+city_name = str(sys.argv[1])
+# city_name = "Ventura"
 ##If reproducing for another city, add elif for
 #that city & desired counties after last line
 
@@ -94,6 +94,18 @@ elif city_name == 'Imperial':
 elif city_name == 'Ventura':
     state = '06'
     FIPS = '111'
+elif city_name == 'Santa Barbara':
+    state = '06'
+    FIPS = '083'
+elif city_name == 'San Luis Obispo':
+    state = '06'
+    FIPS = '079'
+elif city_name == 'Monterey':
+    state = '06'
+    FIPS = '053'
+elif city_name == 'Santa Cruz':
+    state = '06'
+    FIPS = '087'
 else:
     print ('There is not information for the selected city')
 
@@ -425,7 +437,7 @@ usecolumns = ['SF1_P004001',
 # read Census csv
 dtypes = {"Geo_COUNTY": "str","Geo_STATE": "str", "Geo_FIPS":"str"}
 
-ca_00_sf1_sf3 = pd.read_csv("C:/Users/emery/Documents/GitHub/displacement-typologies/data/inputs/US_00_sf1_sf3.csv",
+ca_00_sf1_sf3 = pd.read_csv("~/git/displacement-typologies/data/inputs/US_00_sf1_sf3.csv",
                             usecols = usecolumns, dtype = dtypes )
 
 
@@ -526,7 +538,7 @@ usecolumns_90 = ['STF3_P001_001',
 # read Census csv
 dtypes = {"Geo_COUNTY": "str","Geo_STATE": "str", "Geo_FIPS":"str"}
 
-ca_90_sf1_sf3 = pd.read_csv("C:/Users/emery/Documents/GitHub/displacement-typologies/data/inputs/US_90_sf3.csv",
+ca_90_sf1_sf3 = pd.read_csv("~/git/displacement-typologies/data/inputs/US_90_sf3.csv",
                             usecols = usecolumns_90, dtype = dtypes )
 
 
