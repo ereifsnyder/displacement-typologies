@@ -23,21 +23,21 @@ import sys
 # `python data.py <city name>`
 # Example: python data.py Atlanta
 
-#city_name = str(sys.argv[1])
+city_name = str(sys.argv[1])
 ###
 # When testing city analysis, use:
-city_name = "Ventura"
+# city_name = "Ventura"
 # Run create_lag_vars.r to create lag variables
 # --------------------------------------------------------------------------
 # Note: If additional cities are added, make sure to change create_lag_vars.r
 # accordingly.
 
-lag = pd.read_csv('~/Documents/Github/displacement-typologies/data/outputs/lags/lag.csv')
+lag = pd.read_csv('~/git/displacement-typologies_er/data/outputs/lags/lag_centralcoast.csv')
 
 home = str(Path.home())
 
-input_path = home+'/Documents/Github/displacement-typologies/data/inputs/'
-output_path = home+'/Documents/Github/displacement-typologies/data/outputs/'
+input_path = home+'/git/displacement-typologies_er/data/inputs/'
+output_path = home+'/git/displacement-typologies_er/data/outputs/'
 
 typology_input = pd.read_csv(output_path+'/databases/'+city_name.replace(" ", "")+'_database_2018.csv', index_col = 0) ### Read file
 typology_input['geometry'] = typology_input['geometry'].apply(wkt.loads) ### Read geometry as a shp attribute

@@ -21,63 +21,32 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381', install= TRUE) #enter
 # you will need to update the 'data_dir' variable to the directory
 # you're using
 
-data_dir <- "~/Documents/Github/displacement-typologies/data/outputs/databases/"
-csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
+# edit path to your repo
+path <- "~/git/displacement-typologies_er"
+data_dir <- paste0(path, "/data/outputs/databases/")
 
-df <- 
-    bind_rows(
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Atlanta_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Atlanta") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Denver_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Denver") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Chicago_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Chicago") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/LosAngeles_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Los Angeles") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)), # temp fix
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/SanFrancisco_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "San Francisco") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Seattle_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Seattle") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Cleveland_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Cleveland") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/SanBernardino_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "San Bernardino") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Riverside_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Riverside") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Imperial_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Imperial") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric)),
-            read_csv("C:/users/emery/Documents/Github/displacement-typologies/data/outputs/databases/Ventura_database_2018.csv") %>% 
-            select(!X1) %>% 
-            mutate(city = "Ventura") %>% 
-            mutate_at(vars(state_y:tract_y, state:tract), list(as.numeric))#,
-            # read_csv("~/git/displacement-typologies/data/outputs/databases/Memphis_database_2018.csv") %>% 
-            # select(!X1) %>% 
-            # mutate(city = "Memphis"),
-            # read_csv("~/git/displacement-typologies/data/outputs/databases/Boston_database.csv") %>%
-            # select(!X1) %>%
-            # mutate(city = "Boston")
+## For all files
+# csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
+
+## For select files
+csv_files <- c(
+    paste0(data_dir, 'SantaBarbara_database_2018.csv'),
+    paste0(data_dir, 'Monterey_database_2018.csv'),
+    paste0(data_dir, 'SantaCruz_database_2018.csv'),
+    paste0(data_dir, 'SanLuisObispo_database_2018.csv'),
+    paste0(data_dir, 'Ventura_database_2018.csv')
 )
 
+### Dev file extraction
+df <- 
+    map_dfr(csv_files, function(file){
+        read_csv(file, show_col_types = FALSE) %>% 
+        # select(-...1) %>% 
+        mutate(
+            city = as.character(gsub('.*/databases/\\s{0,1}(.*)\\_database_.*', '\\1', file))) %>% 
+        mutate_at(vars(state_y:tract_y, state:tract, pctch_real_mhval_00_18), list(as.numeric))
+    }) %>% 
+    select(-1)
 
 # ==========================================================================
 # Create rent gap and extra local change in rent
@@ -91,7 +60,8 @@ df <-
 # Memphis and IN is within close proximity of Chicago. 
 
 ### Tract data extraction function: add your state here
-st <- c("IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH")
+# st <- c("IL","GA","AR","TN","CO","MS","AL","KY","MO","IN", "CA", "WA", "OH", "MA", "NH")
+st <- 'CA'
 
 tr_rent <- function(year, state){
     get_acs(
@@ -182,20 +152,21 @@ states <-
     raster::union(tracts("NH", cb = TRUE, class = 'sp'))
 
 stsp <- states
+stsp <- tracts('CA', cb = TRUE, class = 'sp')
 
 # join data to these tracts
 stsp@data <-
     left_join(
-        stsp@data %>% 
-        mutate(GEOID = case_when(
-            !is.na(GEOID.1) ~ GEOID.1, 
-            !is.na(GEOID.2) ~ GEOID.2, 
-            !is.na(GEOID.1.1) ~ GEOID.1.1, 
-            !is.na(GEOID.1.2) ~ GEOID.1.2, 
-            !is.na(GEOID.1.3) ~ GEOID.1.3, 
-            !is.na(GEOID.1.4) ~ GEOID.1.4, 
-            !is.na(GEOID.1.5) ~ GEOID.1.5), 
-    ), 
+        stsp@data, #%>% 
+        # mutate(GEOID = case_when(
+        #     !is.na(GEOID.1) ~ GEOID.1, 
+        #     !is.na(GEOID.2) ~ GEOID.2, 
+        #     !is.na(GEOID.1.1) ~ GEOID.1.1, 
+        #     !is.na(GEOID.1.2) ~ GEOID.1.2, 
+        #     !is.na(GEOID.1.3) ~ GEOID.1.3, 
+        #     !is.na(GEOID.1.4) ~ GEOID.1.4, 
+        #     !is.na(GEOID.1.5) ~ GEOID.1.5), 
+    # ), 
         tr_rents, 
         by = "GEOID") %>% 
     select(GEOID:rm_medrent12)
@@ -290,5 +261,5 @@ lag <- left_join(lag, stsf)
 # Export Data
 # ==========================================================================
 
-# saveRDS(df2, "~/git/displacement-typologies/data/rentgap.rds")
-fwrite(lag, "C:/users/emery/Documents/Github/displacement-typologies/data/outputs/lags/lag.csv")
+fwrite(lag, "~/git/displacement-typologies_er/data/outputs/lags/lag_centralcoast.csv")
+# fwrite(lag, "C:/users/emery/Documents/Github/displacement-typologies/data/outputs/lags/lag.csv")
