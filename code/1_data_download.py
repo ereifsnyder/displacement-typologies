@@ -31,8 +31,8 @@ pd.set_option('display.max_rows', None)
 pd.options.display.float_format = '{:.2f}'.format # avoid scientific notation
 
 home = str(Path.home())
-input_path = home+'/Documents/git/displacement-typologies/data/inputs/'
-output_path = home+'/Documents/git/displacement-typologies/data/outputs/'
+input_path = home+'/git/displacement-typologies_er/data/inputs/'
+output_path = home+'/git/displacement-typologies_er/data/outputs/'
 
 # ==========================================================================
 # Set API Key
@@ -417,7 +417,7 @@ usecolumns = ['SF1_P004001',
 # read Census csv
 dtypes = {"Geo_COUNTY": "str","Geo_STATE": "str", "Geo_FIPS":"str"}
 
-ca_00_sf1_sf3 = pd.read_csv("C:/Users/emery/Documents/git/displacement-typologies/data/inputs/US_00_sf1_sf3.csv",
+ca_00_sf1_sf3 = pd.read_csv("~/git/displacement-typologies_er/data/inputs/US_00_sf1_sf3.csv",
                             usecols = usecolumns, dtype = dtypes )
 
 
@@ -518,7 +518,7 @@ usecolumns_90 = ['STF3_P001_001',
 # read Census csv
 dtypes = {"Geo_COUNTY": "str","Geo_STATE": "str", "Geo_FIPS":"str"}
 
-ca_90_sf1_sf3 = pd.read_csv("C:/Users/emery/Documents/git/displacement-typologies/data/inputs/US_90_sf3.csv",
+ca_90_sf1_sf3 = pd.read_csv("~/git/displacement-typologies_er/data/inputs/US_90_sf3.csv",
                             usecols = usecolumns_90, dtype = dtypes )
 
 

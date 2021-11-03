@@ -27,8 +27,8 @@ pd.set_option('display.max_rows', None)
 pd.options.display.float_format = '{:.2f}'.format # avoid scientific notation
 
 home = str(Path.home())
-input_path = home+'/git/displacement-typologies/data/inputs/'
-output_path = home+'/git/displacement-typologies/data/outputs/'
+input_path = home+'/git/displacement-typologies_er/data/inputs/'
+output_path = home+'/git/displacement-typologies_er/data/outputs/'
 
 # ==========================================================================
 # Set API Key + Select City to Run (inputs needed)
@@ -189,7 +189,7 @@ census_00_filtered = filter_FIPS(census_00_xwalked)
 # Setup / Read Files (inputs needed)
 # ==========================================================================
 # Note: Below is the Google File Drive Stream pathway for a Mac.
-# input_path = '~/git/displacement-typologies/data/inputs/'
+# input_path = '~/git/displacement-typologies_er/data/inputs/'
 # Use this to draw in the 'input_path' variable needed below
 # You will need to redesignate this path if you have a Windows
 # output_path = output_path
