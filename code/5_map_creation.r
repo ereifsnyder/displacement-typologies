@@ -43,20 +43,20 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key h
 
 data <- 
     bind_rows( # pull in data
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/Atlanta_typology_output.csv') %>% 
-            mutate(city = 'Atlanta'),
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/Chicago_typology_output.csv') %>% 
-            mutate(city = 'Chicago'),
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/Cleveland_typology_output.csv') %>% 
-            mutate(city = 'Cleveland'),    
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/Denver_typology_output.csv') %>%
-            mutate(city = 'Denver'),            
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/LosAngeles_typology_output.csv') %>% 
-            mutate(city = 'LosAngeles'), 
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/SanFrancisco_typology_output.csv') %>% 
-            mutate(city = 'SanFrancisco'),
-        read_csv('~/git/displacement-typologies/data/outputs/typologies/Seattle_typology_output.csv') %>% 
-            mutate(city = 'Seattle'),
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/Atlanta_typology_output.csv') %>% 
+        #     mutate(city = 'Atlanta'),
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/Chicago_typology_output.csv') %>% 
+        #     mutate(city = 'Chicago'),
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/Cleveland_typology_output.csv') %>% 
+        #     mutate(city = 'Cleveland'),    
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/Denver_typology_output.csv') %>%
+        #     mutate(city = 'Denver'),            
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/LosAngeles_typology_output.csv') %>% 
+        #     mutate(city = 'LosAngeles'), 
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/SanFrancisco_typology_output.csv') %>% 
+        #     mutate(city = 'SanFrancisco'),
+        # read_csv('~/git/displacement-typologies/data/outputs/typologies/Seattle_typology_output.csv') %>% 
+        #     mutate(city = 'Seattle'),
         read_csv('~/git/displacement-typologies/data/outputs/typologies/SaltLakeCity_typology_output.csv') %>% 
           mutate(city = 'SaltLakeCity')
     ) %>% 
@@ -87,20 +87,23 @@ states <- c(
         '49', # Utah
         '53') # Washington
 
+states <- '49'
+
 ###
 # Begin Neighborhood Typology creation
-###
- # df_nt <- ntdf(state = states) %>% mutate(GEOID = as.numeric(GEOID))
- # ntcheck(df_nt)
- # glimpse(df_nt)
- # df_nt %>% group_by(nt_conc) %>% count() %>% arrange(desc(n))
- # fwrite(df_nt, '~/git/displacement-typologies/data/outputs/downloads/df_nt.csv.gz')
-###
+##
+# 
+ df_nt <- ntdf(state = states, year = 2018) %>% mutate(GEOID = as.numeric(GEOID))
+ ntcheck(df_nt)
+ glimpse(df_nt)
+ df_nt %>% group_by(nt_conc) %>% count() %>% arrange(desc(n))
+ fwrite(df_nt, '~/git/displacement-typologies/data/outputs/downloads/df_nt.csv.gz')
+##
 # End
 ###
 
 # Read in data from above API and reassign factor levels
-df_nt <- read_csv('~/git/displacement-typologies/data/outputs/downloads/dt_nt.csv.gz') %>%
+df_nt <- read_csv('~/git/displacement-typologies/data/outputs/downloads/df_nt.csv.gz') %>%
   mutate(nt_conc =
     factor(nt_conc,
       levels = c(
@@ -127,35 +130,38 @@ df_nt <- read_csv('~/git/displacement-typologies/data/outputs/downloads/dt_nt.cs
     )
   )
 
+
+# 
+
 #
 # Demographics: Student population and vacancy
 # --------------------------------------------------------------------------
 
 ###
 # Begin demographic download
-###
- # dem_vars <- 
- #   c('st_units' = 'B25001_001',
- #     'st_vacant' = 'B25002_003', 
- #     'st_ownocc' = 'B25003_002', 
- #     'st_rentocc' = 'B25003_003',
- #     'st_totenroll' = 'B14007_001',
- #     'st_colenroll' = 'B14007_017',
- #     'st_proenroll' = 'B14007_018',
- #     'st_pov_under' = 'B14006_009', 
- #     'st_pov_grad' = 'B14006_010')
- # tr_dem_acs <-
- #   get_acs(
- #     geography = "tract",
- #     state = states,
- #     output = 'wide',
- #     variables = dem_vars,
- #     cache_table = TRUE,
- #     year = 2018
- #   )
- # fwrite(tr_dem_acs, '~/git/displacement-typologies/data/outputs/downloads/tr_dem_acs.csv.gz')
-### 
-# End
+# ##
+# dem_vars <-
+#   c('st_units' = 'B25001_001',
+#     'st_vacant' = 'B25002_003',
+#     'st_ownocc' = 'B25003_002',
+#     'st_rentocc' = 'B25003_003',
+#     'st_totenroll' = 'B14007_001',
+#     'st_colenroll' = 'B14007_017',
+#     'st_proenroll' = 'B14007_018',
+#     'st_pov_under' = 'B14006_009',
+#     'st_pov_grad' = 'B14006_010')
+# tr_dem_acs <-
+#   get_acs(
+#     geography = "tract",
+#     state = states,
+#     output = 'wide',
+#     variables = dem_vars,
+#     cache_table = TRUE,
+#     year = 2018
+#   )
+# fwrite(tr_dem_acs, '~/git/displacement-typologies/data/outputs/downloads/tr_dem_acs.csv.gz')
+##
+#End
 ###
 
 tr_dem_acs <- read_csv('~/git/displacement-typologies/data/outputs/downloads/tr_dem_acs.csv.gz')
@@ -171,7 +177,7 @@ tr_dem <-
     )
 
 # Load UCLA indicators for LA maps
-ucla_df <- read_excel("~/git/displacement-typologies/data/inputs/UCLAIndicators/UCLA_CNK_COVID19_Vulnerability_Indicators_8_20_2020.xls")
+#ucla_df <- read_excel("~/git/displacement-typologies/data/inputs/UCLAIndicators/UCLA_CNK_COVID19_Vulnerability_Indicators_8_20_2020.xls")
 #
 # Prep dataframe for mapping
 # --------------------------------------------------------------------------
@@ -183,88 +189,88 @@ scale_this <- function(x){
 df <- 
     data %>% 
     left_join(df_nt) %>% 
-    left_join(tr_dem) %>% 
-    left_join(ucla_df, by = c("GEOID" = "tract")) %>% 
-    group_by(city) %>% 
-    mutate(
-        cat_pct_atrisk_workers = 
-            factor(
-                case_when(
-                    pct_atrisk_workers <= 10 ~ "0 to 10%",
-                    pct_atrisk_workers > 10 & pct_atrisk_workers <= 20 ~ "10% to 20%",
-                    pct_atrisk_workers > 20 & pct_atrisk_workers <= 30 ~ "20% to 30%",
-                    pct_atrisk_workers > 30 & pct_atrisk_workers <= 40 ~ "30% to 40%",
-                    pct_atrisk_workers > 40 ~ "40% +"), 
-                levels = (
-                    c("0 to 10%",
-                    "10% to 20%",
-                    "20% to 30%",
-                    "30% to 40%",
-                    "40% +")
-                    )),
-        cat_pct_wo_UI = 
-            factor(
-                case_when(
-                    pct_wo_UI <= 10 ~ "0 to 10%",
-                    pct_wo_UI > 10 & pct_wo_UI <= 20 ~ "10% to 20%",
-                    pct_wo_UI > 20 & pct_wo_UI <= 30 ~ "20% to 30%",
-                    pct_wo_UI > 30 & pct_wo_UI <= 40 ~ "30% to 40%",
-                    pct_wo_UI > 40 ~ "40% +"), 
-                levels = (
-                    c("0 to 10%",
-                    "10% to 20%",
-                    "20% to 30%",
-                    "30% to 40%",
-                    "40% +")
-                    )),
-        cat_SIPBI_dec = 
-            factor(
-                case_when(
-                    SIPBI_dec <= 2 ~ "< 2",
-                    SIPBI_dec > 2 & SIPBI_dec <= 4 ~ "3 to 4",
-                    SIPBI_dec > 4 & SIPBI_dec <= 6 ~ "5 to 6",
-                    SIPBI_dec > 6 & SIPBI_dec <= 8 ~ "7 to 8",
-                    SIPBI_dec > 8 ~ "9 to 10"), 
-                levels = (
-                    c("< 2",
-                    "3 to 4",
-                    "5 to 6",
-                    "7 to 8",
-                    "9 to 10")
-                    )),
-        cat_RVI_dec = 
-            factor(
-                case_when(
-                    RVI_dec <= 2 ~ "< 2",
-                    RVI_dec > 2 & RVI_dec <= 4 ~ "3 to 4",
-                    RVI_dec > 4 & RVI_dec <= 6 ~ "5 to 6",
-                    RVI_dec > 6 & RVI_dec <= 8 ~ "7 to 8",
-                    RVI_dec > 8 ~ "9 to 10"), 
-                levels = (
-                    c("< 2",
-                    "3 to 4",
-                    "5 to 6",
-                    "7 to 8",
-                    "9 to 10")
-                    )),
-        cat_Nr_Aug = 
-            factor(
-                case_when(
-                    Nr_Aug <= 10 ~ "0 to 10%",
-                    Nr_Aug > 10 & Nr_Aug <= 20 ~ "10% to 20%",
-                    Nr_Aug > 20 & Nr_Aug <= 30 ~ "20% to 30%",
-                    Nr_Aug > 30 & Nr_Aug <= 40 ~ "30% to 40%",
-                    Nr_Aug > 40 ~ "40% +"), 
-                levels = (
-                    c("0 to 10%",
-                    "10% to 20%",
-                    "20% to 30%",
-                    "30% to 40%",
-                    "40% +")
-                    )),
+    left_join(tr_dem, on = "GEOID") %>% 
+    #left_join(ucla_df, by = c("GEOID" = "tract")) %>% 
+    group_by(city) %>%
+     mutate(
+    #     cat_pct_atrisk_workers =
+    #         factor(
+    #             case_when(
+                #     pct_atrisk_workers <= 10 ~ "0 to 10%",
+                #     pct_atrisk_workers > 10 & pct_atrisk_workers <= 20 ~ "10% to 20%",
+                #     pct_atrisk_workers > 20 & pct_atrisk_workers <= 30 ~ "20% to 30%",
+                #     pct_atrisk_workers > 30 & pct_atrisk_workers <= 40 ~ "30% to 40%",
+                #     pct_atrisk_workers > 40 ~ "40% +"),
+                # levels = (
+                #     c("0 to 10%",
+                #     "10% to 20%",
+                #     "20% to 30%",
+                #     "30% to 40%",
+                #     "40% +")
+                #     )),
+        # cat_pct_wo_UI =
+        #     factor(
+        #         case_when(
+        #             pct_wo_UI <= 10 ~ "0 to 10%",
+        #             pct_wo_UI > 10 & pct_wo_UI <= 20 ~ "10% to 20%",
+        #             pct_wo_UI > 20 & pct_wo_UI <= 30 ~ "20% to 30%",
+        #             pct_wo_UI > 30 & pct_wo_UI <= 40 ~ "30% to 40%",
+        #             pct_wo_UI > 40 ~ "40% +"),
+        #         levels = (
+        #             c("0 to 10%",
+        #             "10% to 20%",
+        #             "20% to 30%",
+        #             "30% to 40%",
+        #             "40% +")
+        #             )),
+        # cat_SIPBI_dec =
+        #     factor(
+        #         case_when(
+        #             SIPBI_dec <= 2 ~ "< 2",
+        #             SIPBI_dec > 2 & SIPBI_dec <= 4 ~ "3 to 4",
+        #             SIPBI_dec > 4 & SIPBI_dec <= 6 ~ "5 to 6",
+        #             SIPBI_dec > 6 & SIPBI_dec <= 8 ~ "7 to 8",
+        #             SIPBI_dec > 8 ~ "9 to 10"),
+        #         levels = (
+        #             c("< 2",
+        #             "3 to 4",
+        #             "5 to 6",
+        #             "7 to 8",
+        #             "9 to 10")
+        #             )),
+        # cat_RVI_dec =
+        #     factor(
+        #         case_when(
+        #             RVI_dec <= 2 ~ "< 2",
+        #             RVI_dec > 2 & RVI_dec <= 4 ~ "3 to 4",
+        #             RVI_dec > 4 & RVI_dec <= 6 ~ "5 to 6",
+        #             RVI_dec > 6 & RVI_dec <= 8 ~ "7 to 8",
+        #             RVI_dec > 8 ~ "9 to 10"),
+        #         levels = (
+        #             c("< 2",
+        #             "3 to 4",
+        #             "5 to 6",
+        #             "7 to 8",
+        #             "9 to 10")
+        #             )),
+        # cat_Nr_Aug =
+        #     factor(
+        #         case_when(
+        #             Nr_Aug <= 10 ~ "0 to 10%",
+        #             Nr_Aug > 10 & Nr_Aug <= 20 ~ "10% to 20%",
+        #             Nr_Aug > 20 & Nr_Aug <= 30 ~ "20% to 30%",
+        #             Nr_Aug > 30 & Nr_Aug <= 40 ~ "30% to 40%",
+        #             Nr_Aug > 40 ~ "40% +"),
+        #         levels = (
+        #             c("0 to 10%",
+        #             "10% to 20%",
+        #             "20% to 30%",
+        #             "30% to 40%",
+        #             "40% +")
+        #             )),
      # create typology for maps
-        Typology = 
-            factor( # turn to factor for mapping 
+        Typology =
+            factor( # turn to factor for mapping
                 case_when(
                     tr_pstudents > .3 ~ "High Student Population",
             ## Typology ammendments
@@ -277,19 +283,30 @@ df <-
                     typ_cat == "['LISD']" & gent_00_18_urban == 1 ~ 'Early/Ongoing Gentrification',
                     typ_cat == "['OD']" & gent_00_18 == 1 ~ 'Early/Ongoing Gentrification',
                     typ_cat == "['OD']" & gent_00_18_urban == 1 ~ 'Early/Ongoing Gentrification',
+
+            #Rural Adjustments
+                    typ_cat == "['AdvG', 'BE']" ~ 'Becoming Exclusive',
+                    typ_cat == "['LISD']" & gent_90_00 == 1 & dense==0~ 'Advanced Gentrification',
+                    typ_cat == "['LISD']" & gent_90_00_urban == 1 & dense==1 ~ 'Advanced Gentrification',
+                    typ_cat == "['OD']" & gent_90_00 == 1 & dense==0 ~ 'Advanced Gentrification',
+                    typ_cat == "['OD']" & gent_90_00_urban == 1 & dense==1 ~ 'Advanced Gentrification',
+                    typ_cat == "['LISD']" & gent_00_18 == 1 & dense==0 ~ 'Early/Ongoing Gentrification',
+                    typ_cat == "['LISD']" & gent_00_18_urban == 1 & dense==1 ~ 'Early/Ongoing Gentrification',
+                    typ_cat == "['OD']" & gent_00_18 == 1 & dense==0 ~ 'Early/Ongoing Gentrification',
+                    typ_cat == "['OD']" & gent_00_18_urban == 1 & dense==1 ~ 'Early/Ongoing Gentrification',
             ## Regular adjustments
                     typ_cat == "['AdvG']" ~ 'Advanced Gentrification',
                     typ_cat == "['ARE']" ~ 'At Risk of Becoming Exclusive',
                     typ_cat == "['ARG']" ~ 'At Risk of Gentrification',
-                    typ_cat == "['BE']" ~ 'Becoming Exclusive', 
+                    typ_cat == "['BE']" ~ 'Becoming Exclusive',
                     typ_cat == "['EOG']" ~ 'Early/Ongoing Gentrification',
                     typ_cat == "['OD']" ~ 'Ongoing Displacement',
-                    typ_cat == "['SAE']" ~ 'Stable/Advanced Exclusive', 
+                    typ_cat == "['SAE']" ~ 'Stable/Advanced Exclusive',
                     typ_cat == "['LISD']" ~ 'Low-Income/Susceptible to Displacement',
                     typ_cat == "['SMMI']" ~ 'Stable Moderate/Mixed Income',
                     TRUE ~ "Unavailable or Unreliable Data"
-                ), 
-                levels = 
+                ),
+                levels =
                     c(
                         'Low-Income/Susceptible to Displacement',
                         'Ongoing Displacement',
@@ -303,31 +320,27 @@ df <-
                         'High Student Population',
                         'Unavailable or Unreliable Data'
                     )
-            ), 
+            ),
         real_mhval_18 = case_when(real_mhval_18 > 0 ~ real_mhval_18),
         real_mrent_18 = case_when(real_mrent_18 > 0 ~ real_mrent_18)
-    ) %>% 
-    group_by(city) %>% 
+    ) %>%
+    group_by(city) %>%
     mutate(
-        rm_real_mhval_18 = median(real_mhval_18, na.rm = TRUE), 
-        rm_real_mrent_18 = median(real_mrent_18, na.rm = TRUE), 
-        rm_per_nonwhite_18 = median(per_nonwhite_18, na.rm = TRUE), 
+        rm_real_mhval_18 = median(real_mhval_18, na.rm = TRUE),
+        rm_real_mrent_18 = median(real_mrent_18, na.rm = TRUE),
+        rm_per_nonwhite_18 = median(per_nonwhite_18, na.rm = TRUE),
         rm_per_col_18 = median(per_col_18, na.rm = TRUE)
-    ) %>% 
-    group_by(GEOID) %>% 
+    ) %>%
+    group_by(GEOID) %>%
     mutate(
         per_ch_li = (all_li_count_18-all_li_count_00)/all_li_count_00,
-        ci = case_when(
-            GEOID == 6081611900 ~ str_c(
-                "<br><br><b><i><u> Community Input </u></i></b><br>
-                This tract should be Early Ongoing Gentrification. The reason it is not is because the tract population is over 10,000 people, which is much higher than the average tract size of 4,000 people. This high count conceals variation that is seen within other tracts in the region."
-            )), 
-        popup = # What to include in the popup 
+        ci = ' ',
+        popup = # What to include in the popup
           str_c(
-              '<b>Tract: ', GEOID, '<br>',  
+              '<b>Tract: ', GEOID, '<br>',
               Typology, '</b>',
             # Community input layer
-            case_when(!is.na(ci) ~ ci, TRUE ~ ''),
+            #case_when(!is.na(ci) ~ ci, TRUE ~ ''),
             # Market
               '<br><br>',
               '<b><i><u>Market Dynamics</u></i></b><br>',
@@ -335,30 +348,30 @@ df <-
               'Tract home value change from 2000 to 2018: ', case_when(is.na(real_mhval_18) ~ 'No data', TRUE ~ percent(pctch_real_mhval_00_18, accuracy = .1)),'<br>',
               'Regional median home value: ', dollar(rm_real_mhval_18), '<br>',
               '<br>',
-              'Tract median rent: ', case_when(!is.na(real_mrent_18) ~ dollar(real_mrent_18), TRUE ~ 'No data'), '<br>', 
-              'Regional median rent: ', case_when(is.na(real_mrent_18) ~ 'No data', TRUE ~ dollar(rm_real_mrent_18)), '<br>', 
+              'Tract median rent: ', case_when(!is.na(real_mrent_18) ~ dollar(real_mrent_18), TRUE ~ 'No data'), '<br>',
+              'Regional median rent: ', case_when(is.na(real_mrent_18) ~ 'No data', TRUE ~ dollar(rm_real_mrent_18)), '<br>',
               'Tract rent change from 2012 to 2018: ', percent(pctch_real_mrent_12_18, accuracy = .1), '<br>',
               '<br>',
               'Rent gap (nearby - local): ', dollar(tr_rent_gap), '<br>',
               'Regional median rent gap: ', dollar(rm_rent_gap), '<br>',
               '<br>',
             # demographics
-             '<b><i><u>Demographics</u></i></b><br>', 
-             'Tract population: ', comma(pop_18), '<br>', 
-             'Tract household count: ', comma(hh_18), '<br>', 
+             '<b><i><u>Demographics</u></i></b><br>',
+             'Tract population: ', comma(pop_18), '<br>',
+             'Tract household count: ', comma(hh_18), '<br>',
              'Percent renter occupied: ', percent(tr_prenters, accuracy = .1), '<br>',
              'Percent vacant homes: ', percent(tr_pvacant, accuracy = .1), '<br>',
-             'Tract median income: ', dollar(real_hinc_18), '<br>', 
-             'Percent low income hh: ', percent(per_all_li_18, accuracy = .1), '<br>', 
+             'Tract median income: ', dollar(real_hinc_18), '<br>',
+             'Percent low income hh: ', percent(per_all_li_18, accuracy = .1), '<br>',
              'Percent change in LI: ', percent(per_ch_li, accuracy = .1), '<br>',
              '<br>',
              'Percent POC: ', percent(per_nonwhite_18, accuracy = .1), '<br>',
              'Regional median POC: ', percent(rm_per_nonwhite_18, accuracy = .1), '<br>',
-             'Tract racial typology: ', NeighType, '<br>', 
-             'White: ', percent(pWhite, accuracy = .1), '<br>', 
-             'Black: ', percent(pBlack, accuracy = .1), '<br>', 
-             'Asian: ', percent(pAsian, accuracy = .1), '<br>', 
-             'Latinx: ', percent(pLatinx, accuracy = .1), '<br>', 
+             'Tract racial typology: ', NeighType, '<br>',
+             'White: ', percent(pWhite, accuracy = .1), '<br>',
+             'Black: ', percent(pBlack, accuracy = .1), '<br>',
+             'Asian: ', percent(pAsian, accuracy = .1), '<br>',
+             'Latinx: ', percent(pLatinx, accuracy = .1), '<br>',
              'Other: ', percent(pOther, accuracy = .1), '<br>',
              '<br>',
              'Percent students: ', percent(tr_pstudents, accuracy = .1), '<br>',
@@ -366,46 +379,46 @@ df <-
              'Regional median educated: ', percent(rm_per_col_18, accuracy = .1), '<br>',
             '<br>',
             # risk factors
-             '<b><i><u>Risk Factors</u></i></b><br>', 
+             '<b><i><u>Risk Factors</u></i></b><br>',
              'Mostly low income: ', case_when(low_pdmt_medhhinc_18 == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
              'Mix low income: ', case_when(mix_low_medhhinc_18 == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
              'Rent change: ', case_when(dp_PChRent == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
              'Rent gap: ', case_when(dp_RentGap == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
              'Hot Market: ', case_when(hotmarket_18 == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
-             'Vulnerable to gentrification: ', case_when(vul_gent_18 == 1 ~ 'Yes', TRUE ~ 'No'), '<br>', 
-             'Gentrified from 1990 to 2000: ', case_when(gent_90_00 == 1 | gent_90_00_urban == 1 ~ 'Yes', TRUE ~ 'No'), '<br>', 
+             'Vulnerable to gentrification: ', case_when(vul_gent_18 == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
+             'Gentrified from 1990 to 2000: ', case_when(gent_90_00 == 1 | gent_90_00_urban == 1 ~ 'Yes', TRUE ~ 'No'), '<br>',
              'Gentrified from 2000 to 2018: ', case_when(gent_00_18 == 1 | gent_00_18_urban == 1 ~ 'Yes', TRUE ~ 'No')
-          )) %>% 
-    ungroup() %>% 
+          )) %>%
+    ungroup() %>%
     data.frame()
 
 ###
-# Begin Download tracts in each of the shapes in sf (simple feature) class
-###
- # tracts <- 
- #     reduce(
- #         map(states, function(x) # purr loop
- #             get_acs(
- #                 geography = "tract", 
- #                 variables = "B01003_001", 
- #                 state = x, 
- #                 geometry = TRUE, 
- #               year = 2018)
- #         ), 
- #         rbind # bind each of the dataframes together
- #     ) %>% 
- #     select(GEOID) %>% 
- #     mutate(GEOID = as.numeric(GEOID)) %>% 
- #     st_transform(st_crs(4326)) 
- # 
- #     saveRDS(tracts, '~/git/displacement-typologies/data/outputs/downloads/state_tracts.RDS')
-###
-# End
+#Begin Download tracts in each of the shapes in sf (simple feature) class
+##
+# tracts <-
+#     reduce(
+#         map(states, function(x) # purr loop
+#             get_acs(
+#                 geography = "tract",
+#                 variables = "B01003_001",
+#                 state = x,
+#                 geometry = TRUE,
+#               year = 2018)
+#         ),
+#         rbind # bind each of the dataframes together
+#     ) %>%
+#     select(GEOID) %>%
+#     mutate(GEOID = as.numeric(GEOID)) %>%
+#     st_transform(st_crs(4326))
+# 
+#     saveRDS(tracts, '~/git/displacement-typologies/data/outputs/downloads/state_tracts.RDS')
+##
+#End
 ###
 
 tracts <- readRDS('~/git/displacement-typologies/data/outputs/downloads/state_tracts.RDS')
 
-# Join the tracts to the dataframe
+# Join the tracts to the datgliaframe
 
 df_sf <- 
     right_join(tracts, df) 
@@ -418,12 +431,12 @@ df_sf <-
 
 ###
 # Begin Download
-###
- # urban_areas <- 
- #   urban_areas() %>% 
- #   st_transform(st_crs(df_sf))
- # saveRDS(urban_areas, "~/git/displacement-typologies/data/outputs/downloads/urban_areas.rds")
-### 
+##
+# urban_areas <-
+#   urban_areas() %>%
+#   st_transform(st_crs(df_sf))
+# saveRDS(urban_areas, "~/git/displacement-typologies/data/outputs/downloads/urban_areas.rds")
+##
 # End Download
 ###
 
@@ -436,31 +449,29 @@ urban_areas <-
 
 ###
 # Begin Download Counties
-###
- # counties <- 
- #   counties(states) %>% 
- #   st_transform(st_crs(df_sf)) %>% 
- #   .[df_sf, ]  %>% 
- #   arrange(STATEFP, COUNTYFP) 
- # 
- # st_geometry(counties) <- NULL
- # 
- # state_water <- counties %>% pull(STATEFP)
- # county_water <- counties %>% pull(COUNTYFP)
- # 
- # water <- 
- # map2_dfr(state_water, county_water, 
- #   function(states = state_water, counties = county_water){
- #     area_water(
- #       state = states,
- #       county = counties, 
- #       class = 'sf') %>% 
- #     filter(AWATER > 500000)
- #     }) %>% 
- # st_transform(st_crs(df_sf))
- # 
- # saveRDS(water, "~/git/displacement-typologies/data/outputs/downloads/water.rds")
-###
+# counties <-
+#   counties(states) %>%
+#   st_transform(st_crs(df_sf)) %>%
+#   .[df_sf, ]  %>%
+#   arrange(STATEFP, COUNTYFP)
+# 
+# st_geometry(counties) <- NULL
+# 
+# state_water <- counties %>% pull(STATEFP)
+# county_water <- counties %>% pull(COUNTYFP)
+# 
+# water <-
+# map2_dfr(state_water, county_water,
+#   function(states = state_water, counties = county_water){
+#     area_water(
+#       state = states,
+#       county = counties,
+#       class = 'sf') %>%
+#     filter(AWATER > 500000)
+#     }) %>%
+# st_transform(st_crs(df_sf))
+# 
+# saveRDS(water,  "~/git/displacement-typologies/data/outputs/downloads/water.rds")
 # End
 ###
 
@@ -492,27 +503,27 @@ df_sf_urban <-
     ###add your city here
 red <- 
     rbind(
-        geojson_sf('~/git/displacement-typologies/data/overlays/CODenver1938_1.geojson') %>% 
-        mutate(city = 'Denver'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/GAAtlanta1938_1.geojson') %>% 
-        mutate(city = 'Atlanta'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/ILChicago1940_1.geojson') %>% 
-        mutate(city = 'Chicago'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/TNMemphis19XX_1.geojson') %>% 
-        mutate(city = 'Memphis'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/CALosAngeles1939.geojson') %>% 
-        mutate(city = 'LosAngeles'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/WASeattle1936.geojson') %>% 
-        mutate(city = 'Seattle'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/WATacoma1937.geojson') %>% 
-        mutate(city = 'Seattle'), 
-        geojson_sf('~/git/displacement-typologies/data/overlays/CASacramento1937.geojson') %>% 
-        mutate(city = 'SanFrancisco'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/CAOakland1937.geojson') %>% 
-        mutate(city = 'SanFrancisco'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/CASanFrancisco1937.geojson') %>% 
-        mutate(city = 'SanFrancisco'),
-        geojson_sf('~/git/displacement-typologies/data/overlays/UTOgden19XX.geojson') %>% 
+        # geojson_sf('~/git/displacement-typologies/data/overlays/CODenver1938_1.geojson') %>% 
+        # mutate(city = 'Denver'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/GAAtlanta1938_1.geojson') %>% 
+        # mutate(city = 'Atlanta'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/ILChicago1940_1.geojson') %>% 
+        # mutate(city = 'Chicago'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/TNMemphis19XX_1.geojson') %>% 
+        # mutate(city = 'Memphis'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/CALosAngeles1939.geojson') %>% 
+        # mutate(city = 'LosAngeles'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/WASeattle1936.geojson') %>% 
+        # mutate(city = 'Seattle'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/WATacoma1937.geojson') %>% 
+        # mutate(city = 'Seattle'), 
+        # geojson_sf('~/git/displacement-typologies/data/overlays/CASacramento1937.geojson') %>% 
+        # mutate(city = 'SanFrancisco'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/CAOakland1937.geojson') %>% 
+        # mutate(city = 'SanFrancisco'),
+        # geojson_sf('~/git/displacement-typologies/data/overlays/CASanFrancisco1937.geojson') %>% 
+        # mutate(city = 'SanFrancisco'),
+        geojson_sf('~/git/displacement-typologies/data/overlays/UTOgden19XX.geojson') %>%
         mutate(city = 'SaltLakeCity'),
         geojson_sf('~/git/displacement-typologies/data/overlays/UTSaltLakeCity19XX.geojson') %>% 
         mutate(city = 'SaltLakeCity')) %>% 
@@ -610,25 +621,32 @@ university <-
     ) %>% 
     filter(!is.na(city))
 
+### Place Boundaries
+place <-  places(state = states, 
+                 cb = TRUE, 
+                 year = 2018) 
+
+
+
 ### Road map
 ###
 # Begin download road maps
-###
-# road_map <- 
+# ##
+# road_map <-
 #     reduce(
 #         map(states, function(state){
 #             primary_secondary_roads(state, class = 'sf')
 #         }),
 #         rbind
-#     ) %>% 
-#     filter(RTTYP %in% c('I','U')) %>% 
-#     ms_simplify(keep = 0.1) %>% 
+#     ) %>%
+#     filter(RTTYP %in% c('I','U')) %>%
+#     ms_simplify(keep = 0.1) %>%
 #     st_transform(st_crs(df_sf_urban)) %>%
-#     st_join(., df_sf_urban %>% select(city), join = st_intersects) %>% 
-#     mutate(rt = case_when(RTTYP == 'I' ~ 'Interstate', RTTYP == 'U' ~ 'US Highway')) %>% 
+#     st_join(., df_sf_urban %>% select(city), join = st_intersects) %>%
+#     mutate(rt = case_when(RTTYP == 'I' ~ 'Interstate', RTTYP == 'U' ~ 'US Highway')) %>%
 #     filter(!is.na(city))
 # saveRDS(road_map, '~/git/displacement-typologies/data/outputs/downloads/roads.rds')
-###
+# ##
 # End
 ###
 
@@ -800,6 +818,29 @@ map_it <- function(city_name, st){
         group = "Displacement Typology", 
         title = "Displacement Typology"
     ) %>% 
+#Place Boundaries    
+    addPolygons(
+      data = red %>% filter(city == city_name), 
+      group = "Place Boundaries", 
+      label = ~NAME,
+      labelOptions = labelOptions(textsize = "12px"),
+      fillOpacity = .3, 
+      stroke = TRUE, 
+      weight = 1, 
+      opacity = .8, 
+      highlightOptions = highlightOptions(
+        color = "#ff4a4a", 
+        weight = 5,
+        bringToFront = TRUE
+      ), 
+      popup = ~popup
+    ) %>%   
+    addLegend(
+      data = place, 
+      values = ~NAME, 
+      group = "Place Boundaries",
+      title = "Place Boundaries"
+    ) %>%
 # Redlined areas
     addPolygons(
         data = red %>% filter(city == city_name), 
@@ -844,7 +885,7 @@ map_it <- function(city_name, st){
         popup = ~popup,
         popupOptions = popupOptions(maxHeight = 215, closeOnClick = TRUE)
     ) %>%
-    addLegend(,
+    addLegend(data = df_sf_urban %>% filter(city == city_name),
         # position = 'bottomright',s
         pal = nt_pal,
         values = ~nt_conc,
@@ -1156,74 +1197,74 @@ options <- function(
 #
 # City specific displacement-typologies map
 # --------------------------------------------------------------------------
-
-# Atlanta, GA
-atlanta <- 
-    map_it("Atlanta", 'GA') %>% 
-    oz(city_name = "Atlanta") %>% 
-    belt() %>% 
-    options(
-        belt = "Beltline",
-        oz = "Opportunity Zones") %>% 
-    setView(lng = -84.3, lat = 33.749, zoom = 10)
-
-# save map
-htmlwidgets::saveWidget(atlanta, file="~/git/displacement-typologies/maps/atlanta_udp.html")
-
-# Chicago, IL
-chicago <- 
-    map_it("Chicago", 'IL') %>% 
-    oz(city_name = "Chicago") %>% 
-    options(oz = "Opportunity Zones") %>% 
-    setView(lng = -87.7, lat = 41.9, zoom = 10)
-# save map
-htmlwidgets::saveWidget(chicago, file="~/git/displacement-typologies/maps/chicago_udp.html")
-
-# Denver, CO
-denver <- 
-    map_it("Denver", 'CO') %>% 
-    oz(city_name = "Denver") %>%     
-    options(oz = "Opportunity Zones") %>% 
-    setView(lng = -104.98, lat = 39.75, zoom = 11)
+# 
+# # Atlanta, GA
+# atlanta <- 
+#     map_it("Atlanta", 'GA') %>% 
+#     oz(city_name = "Atlanta") %>% 
+#     belt() %>% 
+#     options(
+#         belt = "Beltline",
+#         oz = "Opportunity Zones") %>% 
+#     setView(lng = -84.3, lat = 33.749, zoom = 10)
+# 
 # # save map
-htmlwidgets::saveWidget(denver, file="~/git/displacement-typologies/maps/denver_udp.html")
+# htmlwidgets::saveWidget(atlanta, file="~/git/displacement-typologies/maps/atlanta_udp.html")
+# 
+# # Chicago, IL
+# chicago <- 
+#     map_it("Chicago", 'IL') %>% 
+#     oz(city_name = "Chicago") %>% 
+#     options(oz = "Opportunity Zones") %>% 
+#     setView(lng = -87.7, lat = 41.9, zoom = 10)
+# # save map
+# htmlwidgets::saveWidget(chicago, file="~/git/displacement-typologies/maps/chicago_udp.html")
+# 
+# # Denver, CO
+# denver <- 
+#     map_it("Denver", 'CO') %>% 
+#     oz(city_name = "Denver") %>%     
+#     options(oz = "Opportunity Zones") %>% 
+#     setView(lng = -104.98, lat = 39.75, zoom = 11)
+# # # save map
+# htmlwidgets::saveWidget(denver, file="~/git/displacement-typologies/maps/denver_udp.html")
+# 
+# # San Francisco, CA
+# la <- 
+#     map_it("LosAngeles", 'CA') %>% 
+#     oz(city_name = "LosAngeles") %>% 
+#     ucla(city_name = "LosAngeles") %>% 
+#     options(
+#         oz = "Opportunity Zones",
+#         ucla1 = "Job Displacement Risk",
+#         ucla2 = "Without Unemployment Insurance",
+#         ucla3 = "Shelter-in-Place Burden",
+#         ucla4 = "Renter Vulnerability Index", 
+#         ucla5 = "Census Non-Response Rate"
+#         ) %>% 
+#     setView(lng = -118.2, lat = 34, zoom = 10)
+# # save map
+# htmlwidgets::saveWidget(la, file="~/git/displacement-typologies/maps/losangeles_udp.html")
+# 
+# # San Francisco, CA
+# sf <- 
+#     map_it("SanFrancisco", 'CA') %>% 
+#     oz(city_name = "SanFrancisco") %>% 
+#     options(oz = "Opportunity Zones") %>% 
+#     setView(lng = -122.3, lat = 37.8, zoom = 10)
+# # save map
+# htmlwidgets::saveWidget(sf, file="~/git/displacement-typologies/maps/sanfrancisco_udp.html")
+# 
+# # Seattle, WA
+# seattle <- 
+#     map_it("Seattle", 'WA') %>% 
+#     oz(city_name = "Seattle") %>% 
+#     options(oz = "Opportunity Zones") %>% 
+#     setView(lng = -122.3, lat = 47.6, zoom = 9)
+# # save map
+# htmlwidgets::saveWidget(seattle, file="~/git/displacement-typologies/maps/seattle_udp.html")
 
-# San Francisco, CA
-la <- 
-    map_it("LosAngeles", 'CA') %>% 
-    oz(city_name = "LosAngeles") %>% 
-    ucla(city_name = "LosAngeles") %>% 
-    options(
-        oz = "Opportunity Zones",
-        ucla1 = "Job Displacement Risk",
-        ucla2 = "Without Unemployment Insurance",
-        ucla3 = "Shelter-in-Place Burden",
-        ucla4 = "Renter Vulnerability Index", 
-        ucla5 = "Census Non-Response Rate"
-        ) %>% 
-    setView(lng = -118.2, lat = 34, zoom = 10)
-# save map
-htmlwidgets::saveWidget(la, file="~/git/displacement-typologies/maps/losangeles_udp.html")
-
-# San Francisco, CA
-sf <- 
-    map_it("SanFrancisco", 'CA') %>% 
-    oz(city_name = "SanFrancisco") %>% 
-    options(oz = "Opportunity Zones") %>% 
-    setView(lng = -122.3, lat = 37.8, zoom = 10)
-# save map
-htmlwidgets::saveWidget(sf, file="~/git/displacement-typologies/maps/sanfrancisco_udp.html")
-
-# Seattle, WA
-seattle <- 
-    map_it("Seattle", 'WA') %>% 
-    oz(city_name = "Seattle") %>% 
-    options(oz = "Opportunity Zones") %>% 
-    setView(lng = -122.3, lat = 47.6, zoom = 9)
-# save map
-htmlwidgets::saveWidget(seattle, file="~/git/displacement-typologies/maps/seattle_udp.html")
-
-# Salt Lake CIty, UT
+# Salt Lake City, UT
 slc <- 
   map_it("SaltLakeCity", 'UT') %>% 
   oz(city_name = "SaltLakeCity") %>% 
