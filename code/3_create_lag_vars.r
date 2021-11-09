@@ -22,19 +22,19 @@ census_api_key('4c26aa6ebbaef54a55d3903212eabbb506ade381') #enter your own key h
 # you're using
 
 # edit path to your repo
-path <- "~/git/displacement-typologies_er"
+path <- "~/documents/git/displacement-typologies"
 data_dir <- paste0(path, "/data/outputs/databases/")
 
 ## For all files
 # csv_files <- fs::dir_ls(data_dir, regexp = "2018.csv$")
 
 ## For select files
-# csv_files <- fs::dir_ls(data_dir, regexp = "SaltLakeCity_database_2018.csv$")
+csv_files <- fs::dir_ls(data_dir, regexp = "SaltLakeCity_database_2019.csv$")
 
 ### Dev file extraction
 df <- 
     map_dfr(csv_files, function(file){
-        read_csv(file, show_col_types = FALSE) %>% 
+        read_csv(file) %>% 
         # select(-...1) %>% 
         mutate(
             city = as.character(gsub('.*/databases/\\s{0,1}(.*)\\_database_.*', '\\1', file))) %>% 
@@ -81,9 +81,9 @@ tr_rent <- function(year, state){
 }
 
 ### Loop (map) across different states
-tr_rents18 <- 
+tr_rents19 <- 
     map_dfr(st, function(state){
-        tr_rent(year = 2018, state) %>% 
+        tr_rent(year = 2019, state) %>% 
         mutate(COUNTY = substr(GEOID, 1, 5))
     })
 
@@ -97,26 +97,26 @@ tr_rents12 <-
 gc()
 
 tr_rents <- 
-    bind_rows(tr_rents18, tr_rents12) %>% 
+    bind_rows(tr_rents19, tr_rents12) %>% 
     unite("variable", c(variable,year), sep = "") %>% 
     group_by(variable) %>% 
     spread(variable, medrent) %>% 
     group_by(COUNTY) %>%
     mutate(
-        tr_medrent18 = 
+        tr_medrent19 = 
             case_when(
-                is.na(medrent18) ~ median(medrent18, na.rm = TRUE),
-                TRUE ~ medrent18
+                is.na(medrent19) ~ median(medrent19, na.rm = TRUE),
+                TRUE ~ medrent19
             ),
         tr_medrent12 = 
             case_when(
                 is.na(medrent12) ~ median(medrent12, na.rm = TRUE),
                 TRUE ~ medrent12),
-        tr_chrent = tr_medrent18 - tr_medrent12,
-        tr_pchrent = (tr_medrent18 - tr_medrent12)/tr_medrent12,
-        rm_medrent18 = median(tr_medrent18, na.rm = TRUE), 
+        tr_chrent = tr_medrent19 - tr_medrent12,
+        tr_pchrent = (tr_medrent19 - tr_medrent12)/tr_medrent12,
+        rm_medrent18 = median(tr_medrent19, na.rm = TRUE), 
         rm_medrent12 = median(tr_medrent12, na.rm = TRUE)) %>% 
-    select(-medrent12, -medrent18) %>% 
+    select(-medrent12, -medrent19) %>% 
     distinct() %>% 
     group_by(GEOID) %>% 
     filter(row_number()==1) %>% 
@@ -196,7 +196,7 @@ stsp@data <-
 
     stsp$tr_pchrent.lag <- lag.listw(lw_dist_idwW,stsp$tr_pchrent)
     stsp$tr_chrent.lag <- lag.listw(lw_dist_idwW,stsp$tr_chrent)
-    stsp$tr_medrent18.lag <- lag.listw(lw_dist_idwW,stsp$tr_medrent18)
+    stsp$tr_medrent19.lag <- lag.listw(lw_dist_idwW,stsp$tr_medrent19)
 
 # ==========================================================================
 # Join lag vars with df
@@ -207,16 +207,16 @@ lag <-
         df, 
         stsp@data %>% 
             mutate(GEOID = as.numeric(GEOID)) %>%
-            select(GEOID, tr_medrent18:tr_medrent18.lag)) %>%
+            select(GEOID, tr_medrent19:tr_medrent19.lag)) %>%
     mutate(
-        tr_rent_gap = tr_medrent18.lag - tr_medrent18, 
-        tr_rent_gapprop = tr_rent_gap/((tr_medrent18 + tr_medrent18.lag)/2),
+        tr_rent_gap = tr_medrent19.lag - tr_medrent19, 
+        tr_rent_gapprop = tr_rent_gap/((tr_medrent19 + tr_medrent19.lag)/2),
         rm_rent_gap = median(tr_rent_gap, na.rm = TRUE), 
         rm_rent_gapprop = median(tr_rent_gapprop, na.rm = TRUE), 
         rm_pchrent = median(tr_pchrent, na.rm = TRUE),
         rm_pchrent.lag = median(tr_pchrent.lag, na.rm = TRUE),
         rm_chrent.lag = median(tr_chrent.lag, na.rm = TRUE),
-        rm_medrent17.lag = median(tr_medrent18.lag, na.rm = TRUE), 
+        rm_medrent17.lag = median(tr_medrent19.lag, na.rm = TRUE), 
         dp_PChRent = case_when(tr_pchrent > 0 & 
                                tr_pchrent > rm_pchrent ~ 1, # ∆ within tract
                                tr_pchrent.lag > rm_pchrent.lag ~ 1, # ∆ nearby tracts
@@ -233,7 +233,7 @@ puma <-
     get_acs(
         geography = "public use microdata area", 
         variable = "B05006_001", 
-        year = 2018, 
+        year = 2019, 
         # wide = TRUE, 
         geometry=TRUE, 
         state = st, 

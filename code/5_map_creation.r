@@ -93,7 +93,7 @@ states <- '49'
 # Begin Neighborhood Typology creation
 ##
 # 
- df_nt <- ntdf(state = states, year = 2018) %>% mutate(GEOID = as.numeric(GEOID))
+ df_nt <- ntdf(state = states, year = 2019) %>% mutate(GEOID = as.numeric(GEOID))
  ntcheck(df_nt)
  glimpse(df_nt)
  df_nt %>% group_by(nt_conc) %>% count() %>% arrange(desc(n))
@@ -624,7 +624,9 @@ university <-
 ### Place Boundaries
 place <-  places(state = states, 
                  cb = TRUE, 
-                 year = 2018) 
+                 year = 2018) %>%
+          mutate(NAME = str_remove_all(NAME, " "))
+          
 
 
 
@@ -818,29 +820,31 @@ map_it <- function(city_name, st){
         group = "Displacement Typology", 
         title = "Displacement Typology"
     ) %>% 
-#Place Boundaries    
-    addPolygons(
-      data = red %>% filter(city == city_name), 
-      group = "Place Boundaries", 
-      label = ~NAME,
-      labelOptions = labelOptions(textsize = "12px"),
-      fillOpacity = .3, 
-      stroke = TRUE, 
-      weight = 1, 
-      opacity = .8, 
+ # Place Boundaries
+    addPolylines(
+      data = place %>%  filter(NAME == city_name),
+      group = "Place Boundaries",
+      # label = ~NAME,
+      # labelOptions = labelOptions(textsize = "12px"),
+      fillOpacity = 0,
+      stroke = TRUE,
+      weight = 1,
+      opacity = .8,
+      color = '#5C5C5C',
+      fillColor = "#0000FF",
       highlightOptions = highlightOptions(
-        color = "#ff4a4a", 
+        color = "#ff4a4a",
         weight = 5,
         bringToFront = TRUE
-      ), 
-      popup = ~popup
-    ) %>%   
-    addLegend(
-      data = place, 
-      values = ~NAME, 
-      group = "Place Boundaries",
-      title = "Place Boundaries"
-    ) %>%
+      ),
+  ) %>%
+    # addLegend(
+    #   data = place,
+    #   color = "#0000ffff",
+    #   values = ~NAME,
+    #   group = "Place Boundaries",
+    #   title = "Place Boundaries"
+    # ) %>%
 # Redlined areas
     addPolygons(
         data = red %>% filter(city == city_name), 
@@ -1174,7 +1178,8 @@ options <- function(
                  ucla3, 
                  ucla4, 
                  ucla5, 
-                 "Highways"),
+                 "Highways",
+                "Place Boundaries"),
          options = layersControlOptions(collapsed = FALSE, maxHeight = "auto")) %>% 
      hideGroup(
          c(oz,
@@ -1191,7 +1196,8 @@ options <- function(
              ucla2,
              ucla3, 
              ucla4, 
-             ucla5))
+             ucla5,
+          "Place Boundaries"))
  }
 
 #
@@ -1265,13 +1271,14 @@ options <- function(
 # htmlwidgets::saveWidget(seattle, file="~/git/displacement-typologies/maps/seattle_udp.html")
 
 # Salt Lake City, UT
+
 slc <- 
   map_it("SaltLakeCity", 'UT') %>% 
   oz(city_name = "SaltLakeCity") %>% 
   options(oz = "Opportunity Zones") %>% 
   setView(lng = -111.89, lat = 40.76, zoom = 9)
 # save map
-htmlwidgets::saveWidget(slc, file="~/git/displacement-typologies/maps/SaltLakeCity_udp.html")
+htmlwidgets::saveWidget(slc, file="~/git/displacement-typologies/maps/SaltLakeCity_udp_2019.html")
  
 #
 # Create file exports
