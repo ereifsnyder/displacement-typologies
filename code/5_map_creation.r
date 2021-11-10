@@ -621,7 +621,7 @@ university <-
     ) %>% 
     filter(!is.na(city))
 
-### Place Boundaries
+### City Boundaries
 place <-  places(state = states, 
                  cb = TRUE, 
                  year = 2018) %>%
@@ -784,12 +784,18 @@ ucla_pal2 <-
 
 map_it <- function(city_name, st){
   leaflet(data = df_sf_urban %>% filter(city == city_name)) %>% 
-    addMapPane(name = "polygons", zIndex = 410) %>% 
-    addMapPane(name = "maplabels", zIndex = 420) %>% # higher zIndex rendered on top
-    addProviderTiles("CartoDB.PositronNoLabels") %>%
-    addProviderTiles("CartoDB.PositronOnlyLabels", 
-                   options = leafletOptions(pane = "maplabels"),
-                   group = "map labels") %>% # see: http://leaflet-extras.github.io/leaflet-providers/preview/index.html
+    addMapPane(name = 'polygons', zIndex = 410) %>%
+    addMapPane(name = 'maplabels', zIndex = 420) %>% # higher zIndex rendered on top
+    addProviderTiles('CartoDB.PositronNoLabels') %>%
+    addProviderTiles("Stamen.TerrainLabels", 
+                     options = leafletOptions(pane = 'maplabels'),
+                     group = 'map labels') %>%
+    # addMapPane(name = "polygons", zIndex = 410) %>% 
+    # addMapPane(name = "maplabels", zIndex = 420) %>% # higher zIndex rendered on top
+    # addProviderTiles("CartoDB.PositronNoLabels") %>%
+    # addProviderTiles("CartoDB.PositronOnlyLabels", 
+    #                options = leafletOptions(pane = "maplabels"),
+    #                group = "map labels") %>% # see: http://leaflet-extras.github.io/leaflet-providers/preview/index.html
     addEasyButton(
         easyButton(
             icon="fa-crosshairs", 
@@ -823,14 +829,14 @@ map_it <- function(city_name, st){
  # Place Boundaries
     addPolylines(
       data = place %>%  filter(NAME == city_name),
-      group = "Place Boundaries",
+      group = "City Boundary",
       # label = ~NAME,
       # labelOptions = labelOptions(textsize = "12px"),
       fillOpacity = 0,
       stroke = TRUE,
       weight = 1,
       opacity = .8,
-      color = '#5C5C5C',
+      color = '#ff4a4a',
       fillColor = "#0000FF",
       highlightOptions = highlightOptions(
         color = "#ff4a4a",
@@ -1177,9 +1183,7 @@ options <- function(
                  ucla2,
                  ucla3, 
                  ucla4, 
-                 ucla5, 
-                 "Highways",
-                "Place Boundaries"),
+                 ucla5),
          options = layersControlOptions(collapsed = FALSE, maxHeight = "auto")) %>% 
      hideGroup(
          c(oz,
@@ -1196,8 +1200,7 @@ options <- function(
              ucla2,
              ucla3, 
              ucla4, 
-             ucla5,
-          "Place Boundaries"))
+             ucla5))
  }
 
 #
