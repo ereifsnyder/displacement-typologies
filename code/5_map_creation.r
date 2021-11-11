@@ -1172,19 +1172,19 @@ options <- function(
              c("Displacement Typology", 
                 "Neighborhood Segregation",
                 "Redlined Areas", 
-                oz,#
+                #oz,
                  "Hospitals", 
                  "Universities & Colleges", 
                  'Public Housing',
                  'Industrial Sites',
                  "Transit Stations", 
-                 belt, 
-                 ucla1,
-                 ucla2,
+                 #belt, 
+                 #ucla1,
+                 #ucla2,
                  ucla3, 
                  ucla4, 
                  ucla5),
-         options = layersControlOptions(collapsed = FALSE, maxHeight = "auto")) %>% 
+         options = layersControlOptions(collapsed = FALSE)) %>% 
      hideGroup(
          c(oz,
           "Redlined Areas", 
